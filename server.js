@@ -15,11 +15,14 @@ app.get("/:room", (req, res) => {
   res.render("room", { roomId: req.params.room });
 });
 
-io.on('connection',socket =>{
-    socket.on('join-room',(roomId,userId) =>{
-        socket.join(roomId);
-        socket.broadcast.emit('user-connected',userId)
+io.on('connection', socket => {
+  socket.on('join-room', (roomId, userId) => {
+    socket.join(roomId);
+    socket.to(roomId).broadcast.emit('user-connected', userId)
+    socket.on('disconnect', () => {
+      socket.to(roomId).broadcast.emit('user-disconnected',userId)
     })
+  })
 })
 
 server.listen(3000)
